@@ -1,43 +1,34 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useMemo } from "react";
 
+// Optimized Counter
 const Counter = ({ end, label, duration = 2000 }) => {
   const [count, setCount] = useState(0);
-  const [hasStarted, setHasStarted] = useState(false);
   const ref = useRef(null);
+  const hasStartedRef = useRef(false);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting && !hasStarted) {
-          setHasStarted(true);
+        if (entry.isIntersecting && !hasStartedRef.current) {
+          hasStartedRef.current = true;
+          const startTime = performance.now();
+
+          const animate = (currentTime) => {
+            const progress = Math.min((currentTime - startTime) / duration, 1);
+            setCount(Math.floor(progress * end));
+            if (progress < 1) requestAnimationFrame(animate);
+          };
+
+          requestAnimationFrame(animate);
         }
       },
       { threshold: 0.5 }
     );
 
-    if (ref.current) observer.observe(ref.current);
-
-    return () => {
-      if (ref.current) observer.unobserve(ref.current);
-    };
-  }, [hasStarted]);
-
-  useEffect(() => {
-    if (hasStarted) {
-      let start = 0;
-      const increment = end / (duration / 16);
-      const timer = setInterval(() => {
-        start += increment;
-        if (start >= end) {
-          setCount(end);
-          clearInterval(timer);
-        } else {
-          setCount(Math.ceil(start));
-        }
-      }, 16);
-      return () => clearInterval(timer);
-    }
-  }, [hasStarted, end, duration]);
+    const current = ref.current;
+    if (current) observer.observe(current);
+    return () => current && observer.unobserve(current);
+  }, [end, duration]);
 
   return (
     <div ref={ref} className="text-center relative z-10">
@@ -49,35 +40,42 @@ const Counter = ({ end, label, duration = 2000 }) => {
   );
 };
 
+// Optimized Counter Section
 const CounterSection = () => {
-  const [scrollLeft, setScrollLeft] = useState(0);
-  const [isMobile, setIsMobile] = useState(false);
+  const svgRef = useRef(null);
 
   useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 768); // md breakpoint
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
-  }, []);
+    const svg = svgRef.current;
+    if (!svg) return;
 
-  useEffect(() => {
-    const handleScroll = () => {
-      // Slower factor for mobile, faster for desktop
-      const factor = isMobile ? 0.03 : 0.1;
-      const value = window.scrollY * factor;
-      setScrollLeft(value);
+    let lastScrollY = 0;
+    let ticking = false;
+    const factor = window.innerWidth < 768 ? 0.03 : 0.1;
+
+    const updatePosition = () => {
+      svg.style.left = `${lastScrollY * factor}%`;
+      ticking = false;
     };
 
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [isMobile]);
+    const onScroll = () => {
+      lastScrollY = window.scrollY;
+      if (!ticking) {
+        window.requestAnimationFrame(updatePosition);
+        ticking = true;
+      }
+    };
+
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   return (
     <section className="relative overflow-hidden py-16 bg-[#F6F4F0]">
-      {/* Background SVG with moving left */}
+      {/* Background SVG moves via requestAnimationFrame */}
       <div
-        className="absolute bottom-0 z-0 pointer-events-none transition-all duration-200"
-        style={{ left: `${scrollLeft}%` }}
+        ref={svgRef}
+        className="absolute bottom-0 z-0 pointer-events-none will-change-transform"
+        style={{ left: "0%" }}
         aria-hidden="true"
       >
         <svg

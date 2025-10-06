@@ -1,15 +1,15 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { motion, useAnimation } from "framer-motion";
-import images from "../../constants/images"; // importing from constants
+import images from "../../constants/images";
 
 const content = [
   {
     title: "Building Materials",
     image: images.building,
     details: [
-      'Dune (Sweet) Sand',
-      'Washed Sand',
-      'Black Sand',
+      "Dune (Sweet) Sand",
+      "Washed Sand",
+      "Black Sand",
       'Aggregates (¾", ⅜", 3/16")',
     ],
   },
@@ -44,26 +44,23 @@ const content = [
 const CardCarousel = () => {
   const controls = useAnimation();
   const [isHovered, setIsHovered] = useState(false);
-  const [duration, setDuration] = useState(20);
+  const [duration, setDuration] = useState(25); // slower, smoother
 
-  // detect screen size for speed
+  // ✅ Responsive speed control
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth < 640) {
-        setDuration(10); // faster on mobile
-      } else {
-        setDuration(20); // normal on desktop
-      }
+      setDuration(window.innerWidth < 640 ? 10 : 20);
     };
     handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  // ✅ Continuous scroll animation
   useEffect(() => {
     if (!isHovered) {
       controls.start({
-        x: ["0%", "-100%"],
+        x: ["0%", "-50%"], // only half width, because we duplicate content
         transition: {
           repeat: Infinity,
           duration,
@@ -76,41 +73,46 @@ const CardCarousel = () => {
   }, [isHovered, controls, duration]);
 
   return (
-    <div className="w-[90%] mx-auto my-10">
-      {/* Section Title & Intro */}
-      <div className="text-center mb-8 px-4 my-10">
+    <section className="w-[90%] mx-auto my-20 overflow-hidden">
+      {/* Header */}
+      <div className="text-center mb-10">
         <h2 className="text-3xl font-bold text-gray-800">What We Deliver</h2>
         <p className="mt-2 text-gray-600 max-w-2xl mx-auto">
-          From dune sand to high-spec aggregates, we keep your schedule on track.
+          From dune sand to high-spec aggregates, we keep your schedule on
+          track.
         </p>
       </div>
 
       {/* Carousel */}
       <div
-        className="relative w-full overflow-hidden"
+        className="relative overflow-hidden"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
-        <motion.div className="flex" animate={controls}>
+        <motion.div
+          className="flex will-change-transform"
+          animate={controls}
+          style={{ x: 0 }}
+        >
+          {/* Duplicate once for infinite loop */}
           {[...content, ...content].map((item, i) => (
             <div
               key={i}
-              className="relative w-72 h-96 m-4 bg-white shadow-lg rounded-lg overflow-hidden cursor-pointer group flex-shrink-0"
+              className="relative w-72 h-96 m-4 bg-white shadow-lg rounded-2xl overflow-hidden cursor-pointer flex-shrink-0 group transition-transform hover:-translate-y-1"
             >
-              {/* Image */}
               <img
                 src={item.image}
                 alt={item.title}
-                className="absolute inset-0 w-full h-full object-cover"
+                className="absolute inset-0 w-full h-full object-cover will-change-transform"
+                loading="lazy"
+                draggable="false"
               />
 
-              {/* Overlay Title */}
-              <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/40 to-transparent text-white font-semibold text-lg">
+              <div className="absolute bottom-0 w-full p-4 bg-gradient-to-t from-black/60 to-transparent text-white font-semibold text-lg">
                 {item.title}
               </div>
 
-              {/* Hover overlay */}
-              <div className="absolute inset-0 bg-black/40 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition flex flex-col justify-center items-center text-white p-5 text-sm">
+              <div className="absolute inset-0 bg-black/40 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col justify-center items-center text-white p-5 text-sm">
                 <ul className="list-disc list-inside space-y-1 text-left">
                   {item.details.map((d, idx) => (
                     <li key={idx}>{d}</li>
@@ -121,7 +123,7 @@ const CardCarousel = () => {
           ))}
         </motion.div>
       </div>
-    </div>
+    </section>
   );
 };
 
