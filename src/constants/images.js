@@ -1,4 +1,4 @@
-import hero0 from "../assets/images/Container.jpg"
+import hero0 from "../assets/images/container.jpg"
 import hero1 from "../assets/images/truck1.jpg"
 import hero2 from "../assets/images/truck2.png"
 import hero3 from "../assets/images/truck3.png"
