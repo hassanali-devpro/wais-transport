@@ -1,7 +1,8 @@
-import React, { useEffect, useState, useRef, useMemo } from "react";
+import React, { useEffect, useState, useRef } from "react";
+import { Clock, Truck, Building2, Users } from "lucide-react"; // Lucide Icons
 
-// Optimized Counter
-const Counter = ({ end, label, duration = 2000 }) => {
+// Optimized Counter Component
+const Counter = ({ end, label, duration = 2000, Icon }) => {
   const [count, setCount] = useState(0);
   const ref = useRef(null);
   const hasStartedRef = useRef(false);
@@ -31,16 +32,25 @@ const Counter = ({ end, label, duration = 2000 }) => {
   }, [end, duration]);
 
   return (
-    <div ref={ref} className="text-center relative z-10">
+    <div
+      ref={ref}
+      className="text-center relative z-10 flex flex-col items-center"
+    >
+      {/* Counter Number */}
       <h2 className="text-3xl md:text-5xl font-bold text-gray-800">
         {count.toLocaleString()}+
       </h2>
-      <p className="text-gray-600 text-lg mt-2">{label}</p>
+
+      {/* Label + Transparent Icon */}
+      <div className="flex items-center justify-center gap-2 mt-2">
+        <Icon className="w-6 h-6 text-gray-700 opacity-40" />
+        <p className="text-gray-700 text-lg font-medium">{label}</p>
+      </div>
     </div>
   );
 };
 
-// Optimized Counter Section
+// Counter Section
 const CounterSection = () => {
   const svgRef = useRef(null);
 
@@ -71,7 +81,7 @@ const CounterSection = () => {
 
   return (
     <section className="relative overflow-hidden py-16 bg-[#F6F4F0]">
-      {/* Background SVG moves via requestAnimationFrame */}
+      {/* Moving Background SVG */}
       <div
         ref={svgRef}
         className="absolute bottom-0 z-0 pointer-events-none will-change-transform"
@@ -84,20 +94,32 @@ const CounterSection = () => {
           preserveAspectRatio="none"
           className="w-full h-full"
         >
-          <g fill="#C0C0C0" opacity="0.3">
+          <g fill="#C0C0C0" opacity="0.25">
             <rect x="0" y="-100" width="40" height="500" transform="skewX(20)" />
-            <rect x="80" y="-100" width="40" height="500" transform="skewX(20)" />
-            <rect x="160" y="-100" width="40" height="500" transform="skewX(20)" />
+            <rect
+              x="80"
+              y="-100"
+              width="40"
+              height="500"
+              transform="skewX(20)"
+            />
+            <rect
+              x="160"
+              y="-100"
+              width="40"
+              height="500"
+              transform="skewX(20)"
+            />
           </g>
         </svg>
       </div>
 
       {/* Counters */}
-      <div className="relative z-10 max-w-6xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8">
-        <Counter end={10} label="Years of Service" />
-        <Counter end={4000000} label="Tons Delivered" />
-        <Counter end={20} label="Projects" />
-        <Counter end={200} label="Employees" />
+      <div className="relative z-10 max-w-6xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-10">
+        <Counter end={10} label="Years of Service" Icon={Clock} />
+        <Counter end={4000000} label="Tons Delivered" Icon={Truck} />
+        <Counter end={20} label="Projects" Icon={Building2} />
+        <Counter end={200} label="Employees" Icon={Users} />
       </div>
     </section>
   );

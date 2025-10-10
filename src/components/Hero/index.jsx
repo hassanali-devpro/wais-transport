@@ -1,21 +1,15 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Link as ScrollLink } from "react-scroll";
 import Navbar from "../Navbar";
+import { Link } from "react-router-dom";
 
-const Header = ({
-  title,
-  description,
-  buttonText,
-  pageLink,
-  Hero,
-}) => {
+const Header = ({ title, description, buttonText, pageLink, Hero }) => {
   const [activeIndex, setActiveIndex] = useState(0);
-  const [loadedCount, setLoadedCount] = useState(0);
   const [allLoaded, setAllLoaded] = useState(false);
   const totalSlides = Object.keys(Hero).length;
   const intervalRef = useRef(null);
 
-  // ✅ Preload images and show loader until all are ready
+  // ✅ Preload images
   useEffect(() => {
     let isMounted = true;
 
@@ -37,7 +31,7 @@ const Header = ({
     };
   }, [Hero]);
 
-  // ✅ Auto-slide only when loaded and component is visible
+  // ✅ Auto-slide only when loaded
   useEffect(() => {
     if (!allLoaded) return;
 
@@ -48,7 +42,7 @@ const Header = ({
     return () => clearInterval(intervalRef.current);
   }, [allLoaded, totalSlides]);
 
-  // ✅ Helper to get image opacity class
+  // ✅ Helper for image fade animation
   const getSlideClass = (index) =>
     `absolute inset-0 transition-opacity duration-1000 ease-in-out ${
       index === activeIndex ? "opacity-100" : "opacity-0"
@@ -59,22 +53,6 @@ const Header = ({
       <Navbar />
 
       <div className="relative overflow-hidden w-full h-screen bg-[#F6F4F0]">
-        {/* Loader Overlay */}
-        {!allLoaded && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#F6F4F0] z-50">
-            <img
-              src="/loader.png"
-              alt="Company Logo"
-              className="w-40 mb-6 opacity-90"
-            />
-            <div className="flex space-x-2">
-              <span className="h-5 w-5 bg-[#373736] rounded-full animate-bounce [animation-delay:-0.3s]" />
-              <span className="h-5 w-5 bg-[#373736] rounded-full animate-bounce [animation-delay:-0.15s]" />
-              <span className="h-5 w-5 bg-[#373736] rounded-full animate-bounce" />
-            </div>
-          </div>
-        )}
-
         {/* Hero Slides */}
         <div
           className={`absolute inset-0 transition-opacity duration-700 ${
@@ -98,14 +76,14 @@ const Header = ({
                   {description}
                 </p>
                 <div className="flex justify-center lg:justify-start gap-2">
-                  <ScrollLink
+                  <Link
                     to={pageLink}
                     smooth={true}
                     duration={500}
                     className="btn italic border-2 py-1.5 px-6 rounded-xl font-semibold transition cursor-pointer hover:bg-white hover:text-black"
                   >
                     {buttonText}
-                  </ScrollLink>
+                  </Link>
                 </div>
               </div>
             </div>

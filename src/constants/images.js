@@ -10,7 +10,11 @@ import logistics from "../assets/images/logistics.jpg"
 import fuel from "../assets/images/fuel.jpg"
 import airport from "../assets/images/airport.jpg"
 import hospital from "../assets/images/hospital.webp"
-
+import sustainable from "../assets/images/sustainable-city.webp"
+import jvc from "../assets/images/JVC.webp"
+import ANDOC from "../assets/images/ADNOC.jpg"
+import watan from "../assets/images/watan.jpg"
+import dragonMart from "../assets/images/dragonMart.jpg"
 
 const images = {
     building,
@@ -29,9 +33,20 @@ const HeroImages = {
     hero2,
     hero1,
     hero0,
-
 };
 
+const Projects = {
+    airport,
+    jvc,
+    sustainable,
+    watan,
+    ANDOC,
+    hero0,
+    dragonMart,
+    hospital,
 
-export { HeroImages };
+}
+
+
+export { HeroImages, Projects };
 export default images;
